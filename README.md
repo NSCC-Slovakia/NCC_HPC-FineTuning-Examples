@@ -3,3 +3,5 @@ HPC Fine-Tuning Examples repository dedicated to providing examples and tutorial
 
 ## Sentiment Analysis
 This repository provides scripts to train a BERT model for sentiment analysis using the Twitter dataset. It includes data preprocessing, model training, evaluation, and inference.
+
+**Note:** Customize paths and file names as necessary based on your project structure and requirements.
