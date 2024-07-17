@@ -3,7 +3,7 @@ This repository provides scripts to train a BERT model for sentiment analysis us
 
 ## Files
 - **sentiment_analysis_bert_train.py:** Script to preprocess the Twitter dataset, train a BERT model for sentiment analysis, evaluate the model, and save the trained model.
-- **run_training.py:** Shell script to execute sentiment_analysis_bert_train.py for training the BERT model on HPC Devana.
+- **run_training.py:** Shell script to execute sentiment_analysis_bert_train.py on HPC Devana.
 
 ---
 
