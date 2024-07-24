@@ -6,6 +6,13 @@ __pycache__/
 # C extensions
 *.so
 
+# OSX
+.DS_Store
+
+# Data, gennerated and Download
+Data/
+data/
+
 # Distribution / packaging
 .Python
 build/
