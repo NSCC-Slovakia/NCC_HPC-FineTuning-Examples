@@ -16,7 +16,7 @@ model = AutoModelForSeq2SeqLM.from_pretrained("CohereForAI/aya-101")
 
 # load only the test data
 splits = {'train': 'data/train-00000-of-00001.parquet', 'test': 'data/test-00000-of-00001.parquet', 'validation': 'data/validation-00000-of-00001.parquet'}
-df = pd.read_parquet("hf://datasets/openlifescienceai/medmcqa/" + splits["test"])
+df = pd.read_parquet("hf://datasets/openlifescienceai/medmcqa/" + splits["validation"])
 df = df[df['choice_type'] != 'multi'] # only single choice questions, multi choice questions are not properly defined by the dataset
 
 # create prompts for the model
