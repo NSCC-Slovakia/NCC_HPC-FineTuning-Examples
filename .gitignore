@@ -10,8 +10,8 @@ __pycache__/
 .DS_Store
 
 # Data, gennerated and Download
-Data/*
-data/*
+Data
+data
 
 # Distribution / packaging
 .Python
