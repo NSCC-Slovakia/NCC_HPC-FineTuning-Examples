@@ -30,9 +30,7 @@ b = 0
 for index, row in df.iterrows():
     #print(row['prompt'])
     prompt_inputs = tokenizer.encode(row['prompt'], return_tensors="pt")
-    prompt_inputs['pad_token_id'] = tokenizer.eos_token_id
-    prompt_inputs['attention_mask'] = prompt_inputs['input_ids'].ne(tokenizer.pad_token_id).int()
-    prompt_outputs = model.generate(prompt_inputs, max_new_tokens=7)
+    prompt_outputs = model.generate(prompt_inputs, max_new_tokens=128)
     df.loc[index, 'answer'] = tokenizer.decode(prompt_outputs[0], skip_special_tokens=True)
     print(tokenizer.decode(prompt_outputs[0], skip_special_tokens=True))
     print(b)
