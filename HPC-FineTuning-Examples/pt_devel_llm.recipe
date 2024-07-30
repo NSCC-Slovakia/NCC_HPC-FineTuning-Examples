@@ -1,0 +1,19 @@
+Bootstrap: docker
+From: pytorch/pytorch:2.3.1-cuda12.1-cudnn8-devel
+
+%post
+  apt-get update  
+  apt-get install -y python3-pip  
+  apt-get install -y git  
+  python3 -m pip install -U pip  
+  pip install -U transformers accelerate bitsandbytes peft trl
+  pip install -U seqeval unidecode scikit-learn datetime 
+  pip install -U FlagEmbedding annoy
+  pip install -U optuna matplotlib
+  pip install -U flash-attn --no-build-isolation 
+
+%environment
+  export PATH=/usr/local/cuda/bin:$PATH
+  export CUDA_HOME=/usr/local/cuda
+
+
