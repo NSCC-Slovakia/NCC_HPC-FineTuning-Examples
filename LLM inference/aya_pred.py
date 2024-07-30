@@ -13,7 +13,7 @@ torch.cuda.manual_seed_all(seed)
 model_id = "CohereForAI/aya-101"
 
 tokenizer = AutoTokenizer.from_pretrained(model_id)
-model = AutoModelForSeq2SeqLM.from_pretraine(
+model = AutoModelForSeq2SeqLM.from_pretrained(
     model_id,
     low_cpu_mem_usage=True,
     torch_dtype=torch.bfloat16,
