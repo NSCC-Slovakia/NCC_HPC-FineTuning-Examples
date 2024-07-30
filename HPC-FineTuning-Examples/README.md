@@ -4,4 +4,8 @@ HPC Fine-Tuning Examples repository dedicated to providing examples and tutorial
 ## Sentiment Analysis
 This repository provides scripts to train a BERT model for sentiment analysis using the Twitter dataset. It includes data preprocessing, model training, evaluation, and inference.
 
+## Embedding Indices
+This repository provides scripts to build BGE embeddings using the BGE-M3 model and retrieve similar documents from the 20 Newsgroups dataset using an Annoy index.
+
 **Note:** Customize paths and file names as necessary based on your project structure and requirements.
+The tutorial scripts download data and models from the internet. Therefore, it is necessary to use a node with access to the internet (login node) to run this script for the first time (then downloaded files are saved in cache).
