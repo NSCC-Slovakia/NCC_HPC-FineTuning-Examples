@@ -39,7 +39,7 @@ b = 0
 for index, row in df.iterrows():
     #print(row['prompt'])
     prompt_inputs = tokenizer.encode(row['prompt'], return_tensors="pt")
-    prompt_outputs = model.generate(prompt_inputs, max_new_tokens=128)
+    prompt_outputs = model.generate(prompt_inputs, max_new_tokens=7)
     df.loc[index, 'answer'] = tokenizer.decode(prompt_outputs[0], skip_special_tokens=True)
     print(tokenizer.decode(prompt_outputs[0], skip_special_tokens=True))
     print(b)
