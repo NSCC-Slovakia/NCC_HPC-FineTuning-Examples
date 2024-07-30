@@ -10,9 +10,15 @@ np.random.seed(seed)
 torch.manual_seed(seed)
 torch.cuda.manual_seed_all(seed)
 
+model_id = "CohereForAI/aya-101"
 
-tokenizer = AutoTokenizer.from_pretrained("CohereForAI/aya-101")
-model = AutoModelForSeq2SeqLM.from_pretrained("CohereForAI/aya-101")
+tokenizer = AutoTokenizer.from_pretrained(model_id)
+model = AutoModelForSeq2SeqLM.from_pretraine(
+    model_id,
+    low_cpu_mem_usage=True,
+    torch_dtype=torch.bfloat16,
+    device_map='cuda'
+    )
 
 # load only the test data
 splits = {'train': 'data/train-00000-of-00001.parquet', 'test': 'data/test-00000-of-00001.parquet', 'validation': 'data/validation-00000-of-00001.parquet'}
