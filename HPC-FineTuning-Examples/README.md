@@ -3,9 +3,9 @@ HPC Fine-Tuning Examples repository dedicated to providing examples and tutorial
 Our goal is to help researchers and practitioners efficiently leverage HPC infrastructure to enhance their NLP workflows.
 
 ## Contents
-- **Sentiment Analysis/**: This repository provides scripts to train a BERT model for sentiment analysis using the Twitter dataset. It includes data preprocessing, model training, evaluation, and inference.
-- **Embedding Indices/**: This repository provides scripts for building information retrieval tool using BGE embeddings - BGE-M3 model, to retrieve similar documents from the 20 Newsgroups dataset using an Annoy index.
-- **NER/**: This repository contains scripts and utilities for training DistilBERT model for Named Entity Recognition (NER). The model is fine-tuned on the CoNLL-2003 dataset, which includes named entities such as persons (PER), organizations (ORG), locations (LOC), and miscellaneous entities (MISC).
+- **Embedding Indices**: This repository provides scripts for building information retrieval tool using BGE embeddings - BGE-M3 model, to retrieve similar documents from the 20 Newsgroups dataset using an Annoy index.
+- **NER**: This repository contains scripts and utilities for training DistilBERT model for Named Entity Recognition (NER). The model is fine-tuned on the CoNLL-2003 dataset, which includes named entities such as persons (PER), organizations (ORG), locations (LOC), and miscellaneous entities (MISC).
+- **Sentiment Analysis**: This repository provides scripts to train a BERT model for sentiment analysis using the Twitter dataset. It includes data preprocessing, model training, evaluation, and inference.
 
 **Note:** Customize paths and file names as necessary based on your project structure and requirements.
 The tutorial scripts download data and models from the internet, so it's necessary to use a node with internet access (login node) to run these scripts for the first time. The downloaded files will then be saved in cache for subsequent runs.
