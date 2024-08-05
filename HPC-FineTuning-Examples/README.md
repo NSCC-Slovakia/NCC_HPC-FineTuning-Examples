@@ -12,9 +12,16 @@ The tutorial scripts download data and models from the internet, so it's necessa
 
 ## Requirements
 
-To use the examples provided in this repository, you will need the following:
+To use the examples provided in this repository, you have two options:
 
-- **Singularity**: Singularity-CE version 3.10 or higher is required. 
-- **Recipe File**: A Singularity recipe file named `pt_devel_llm.recipe`.
+1. **Use an Existing Singularity Image**: Utilize the existing Singularity image named `pt-2.3_llm.sif`, which contains all the necessary libraries.
+2. **Create a New Singularity Image**: Follow the instructions below to create a new Singularity image.
 
-There is an existing Singularity image named pt-2.3_llm.sif, built according to this recipe. It contains all necessary libraries, and the tutorials were built and tested on it.
+### Instructions for Creating a New Singularity Image:
+
+- **Singularity**: Ensure you have Singularity-CE version 3.10 or higher installed.
+- **Recipe File**: Use the Singularity recipe file named `pt_devel_llm.recipe`.
+- **Build Command**: To build a Singularity image from the recipe file, use the following command:
+
+  ```sh
+  sudo singularity build test.sif pt_devel_llm.recipe
