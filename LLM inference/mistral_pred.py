@@ -10,7 +10,7 @@ np.random.seed(seed)
 torch.manual_seed(seed)
 torch.cuda.manual_seed_all(seed)
 
-model_id = "mistralai/Mistral-7B-Instruct-v0.3"
+model_id = "mistralai/Mistral-7B-Instruct-v0.2"
 
 tokenizer = AutoTokenizer.from_pretrained(model_id)
 model = AutoModelForCausalLM.from_pretrained(
