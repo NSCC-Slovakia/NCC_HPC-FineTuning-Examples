@@ -58,7 +58,7 @@ for index, row in df.iterrows():
         )
     response = prompt_outputs[0][prompt_inputs.shape[-1]:]
     df.loc[index, 'answer'] = tokenizer.decode(response, skip_special_tokens=True)
-    print(df[index, 'answer'])
+    print(tokenizer.decode(response, skip_special_tokens=True))
     print(b)
     b = b + 1
 
