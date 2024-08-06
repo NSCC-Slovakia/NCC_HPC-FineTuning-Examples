@@ -17,7 +17,7 @@ model = AutoModelForCausalLM.from_pretrained(
     model_id,
     low_cpu_mem_usage=True,
     torch_dtype=torch.bfloat16,
-    device_map='auto'
+    device_map='cuda'
 )
 
 # load only the test data
@@ -58,7 +58,7 @@ for index, row in df.iterrows():
         )
     response = prompt_outputs[0][prompt_inputs.shape[-1]:]
     df.loc[index, 'answer'] = tokenizer.decode(response, skip_special_tokens=True)
-    print(tokenizer.decode(prompt_outputs[0], skip_special_tokens=True))
+    print(df[index, 'answer'])
     print(b)
     b = b + 1
 

@@ -17,7 +17,7 @@ model = AutoModelForSeq2SeqLM.from_pretrained(
     model_id,
     low_cpu_mem_usage=True,
     torch_dtype=torch.bfloat16,
-    device_map='auto'
+    device_map='cuda'
     )
 
 # load only the test data
