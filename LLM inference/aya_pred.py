@@ -29,7 +29,7 @@ df = df[df['choice_type'] != 'multi'] # only single choice questions, multi choi
 df['prompt'] = None
 df['answer'] = None
 for index, row in df.iterrows():
-    df.at[index, 'prompt'] = row['question'] + '\nchoose only one of the following options: \na. ' + row['opa'] + '\nb. ' + row['opb'] + '\nc. ' + row['opc'] + '\nd. ' + row['opd']
+    df.at[index, 'prompt'] = row['question'] + '\nchoose only one of the following options: \n1. ' + row['opa'] + '\n2. ' + row['opb'] + '\n3. ' + row['opc'] + '\n4. ' + row['opd']
     
 df = df.sample(n=500, random_state=seed) # sample only 500 questions for testing
 
