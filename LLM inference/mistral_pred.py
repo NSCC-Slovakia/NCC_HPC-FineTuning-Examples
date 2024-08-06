@@ -64,5 +64,28 @@ for index, row in df.iterrows():
 
 print(df.head())
 
+df['prediction'] = None
+
+for index, row in df.iterrows():
+    pom = row["answer"]
+    if row["opa"] in pom or "1." in pom or "1" in pom:
+        df.at[index, "prediction"] = 0
+    elif row["opb"] in pom or "2." in pom or "2" in pom:  
+        df.at[index, "prediction"] = 1
+    elif row["opc"] in pom or "3." in pom or "3" in pom:
+        df.at[index, "prediction"] = 2
+    elif row["opd"] in pom or "4." in pom or "4" in pom:  
+        df.at[index, "prediction"] = 3
+    else:
+        df.at[index, "prediction"] = "invalid"
+        
+accuracy = sum(df["cop"] == df["prediction"])/df.shape[0]
+false_positive = sum(df["cop"] != df["prediction"])/df.shape[0]
+no_invalid = sum(df["prediction"] == "invalid")/df.shape[0]
+
+print("Accuracy: ", accuracy)
+print("False positive: ", false_positive)
+print("Invalid: ", no_invalid)
+
 filename = "data/test_mistral"
 df.to_csv(filename+".csv", index=False)
