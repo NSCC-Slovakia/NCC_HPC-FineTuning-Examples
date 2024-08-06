@@ -53,7 +53,7 @@ for index, row in df.iterrows():
     prompt_outputs = model.generate(
         prompt_inputs,
         attention_mask=attention_mask,
-        max_new_tokens=7,
+        max_new_tokens=20,
         eos_token_id=terminators,
         )
     response = prompt_outputs[0][prompt_inputs.shape[-1]:]
