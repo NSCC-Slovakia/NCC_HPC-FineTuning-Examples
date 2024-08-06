@@ -17,7 +17,7 @@ model = AutoModelForSeq2SeqLM.from_pretrained(
     model_id,
     low_cpu_mem_usage=True,
     torch_dtype=torch.bfloat16,
-    device_map='cuda'
+    device_map='auto'
     )
 
 # load only the test data
@@ -36,13 +36,36 @@ df = df.sample(n=500, random_state=seed) # sample only 500 questions for testing
 b = 0
 for index, row in df.iterrows():
     #print(row['prompt'])
-    prompt_inputs = tokenizer.encode(row['prompt'], return_tensors="pt").to("cuda")
+    prompt_inputs = tokenizer.encode(row['prompt'], return_tensors="pt").to(model.device)
     prompt_outputs = model.generate(prompt_inputs, max_new_tokens=7)
     df.loc[index, 'answer'] = tokenizer.decode(prompt_outputs[0], skip_special_tokens=True)
     print(b)
     b = b + 1
 
-print(df.head())
+df['prediction'] = None
+
+for index, row in df.iterrows():
+    pom = row["answer"]
+    if row["opa"] in pom or "1." in pom:
+        df.at[index, "prediction"] = 0
+    elif row["opb"] in pom or "2." in pom:  
+        df.at[index, "prediction"] = 1
+    elif row["opc"] in pom or "3." in pom:
+        df.at[index, "prediction"] = 2
+    elif row["opd"] in pom or "4." in pom:  
+        df.at[index, "prediction"] = 3
+    else:
+        df.at[index, "prediction"] = "invalid"
+        print("Invalid detected: ", pom, index)
+
+accuracy = sum(df["cop"] == df["prediction"])/df.shape[0]
+false_positive = sum(df["cop"] != df["prediction"])/df.shape[0]
+no_invalid = sum(df["prediction"] == "invalid")/df.shape[0]
+
+print("Accuracy: ", accuracy)
+print("False positive: ", false_positive)
+print("Invalid: ", no_invalid)
 
 filename = "data/test_aya"
 df.to_csv(filename+".csv", index=False)
+

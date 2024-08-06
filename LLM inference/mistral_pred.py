@@ -17,7 +17,7 @@ model = AutoModelForCausalLM.from_pretrained(
     model_id,
     low_cpu_mem_usage=True,
     torch_dtype=torch.bfloat16,
-    device_map='cuda'
+    device_map='auto'
 )
 
 # load only the test data
@@ -33,12 +33,31 @@ for index, row in df.iterrows():
     
 df = df.sample(n=500, random_state=seed) # sample only 500 questions for testing
 
+terminators = [
+    tokenizer.eos_token_id,
+    tokenizer.convert_tokens_to_ids("<|eot_id|>")
+]
+
 b = 0
 for index, row in df.iterrows():
-    #print(row['prompt'])
-    prompt_inputs = tokenizer.encode(row['prompt'], return_tensors="pt").to("cuda")
-    prompt_outputs = model.generate(prompt_inputs, max_new_tokens=7)
-    df.loc[index, 'answer'] = tokenizer.decode(prompt_outputs[0], skip_special_tokens=True)
+    chat = [
+        {"role": "user", "content": row['prompt'] }, 
+    ]
+    prompt_inputs = tokenizer.apply_chat_template(
+        chat, 
+        add_generation_prompt=True, 
+        return_tensors="pt"
+        ).to(model.device)
+    attention_mask = torch.ones_like(prompt_inputs)  
+    
+    prompt_outputs = model.generate(
+        prompt_inputs,
+        attention_mask=attention_mask,
+        max_new_tokens=32,
+        eos_token_id=terminators,
+        )
+    response = prompt_outputs[0][prompt_inputs.shape[-1]:]
+    df.loc[index, 'answer'] = tokenizer.decode(response, skip_special_tokens=True)
     print(tokenizer.decode(prompt_outputs[0], skip_special_tokens=True))
     print(b)
     b = b + 1
