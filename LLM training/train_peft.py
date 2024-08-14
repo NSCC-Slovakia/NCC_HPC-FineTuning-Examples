@@ -54,8 +54,7 @@ print(dataset["train"])
 
 def apply_chat_template(example, tokenizer):
     chat = [
-        {"role": "system", "content": "You will be given a question/sentence in Slovak language asked by a customer. You are supposed to select the best intent option based on the question. If you are uncertain, or none of the intents describes the question, choose 'invalid'. Your response should only contain the name of the chosen option."},
-        {"role": "user", "content": example['instruction'][:-150] }, #novy system content + MS prompt
+        {"role": "user", "content": example['instruction']}, #novy system content + MS prompt
         { "role": "assistant", "content": example['output'] },
     ]
     example["text"] = tokenizer.apply_chat_template(chat, tokenize=False)
