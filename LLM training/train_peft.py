@@ -13,19 +13,28 @@ import torch
 from trl import SFTTrainer
 from peft import LoraConfig
 from transformers import AutoTokenizer, AutoModelForCausalLM #?
-access_token = ""
 
-df = pd.read_csv('/home/valabek/LLM/prompt_data/LLM_prompt_train_nostrict_v0.csv')
+
+splits = {'train': 'data/train-00000-of-00001.parquet', 'test': 'data/test-00000-of-00001.parquet', 'validation': 'data/validation-00000-of-00001.parquet'}
+df = pd.read_parquet("hf://datasets/openlifescienceai/medmcqa/" + splits["train"])
+df = df[df['choice_type'] != 'multi'] # only single choice questions, multi choice questions are not properly defined by the dataset
+
+# create prompts for the model
+df['prompt'] = None
+for index, row in df.iterrows():
+    df.at[index, 'prompt'] = row['question'] + '\nchoose only one of the following options: \n1. ' + row['opa'] + '\n2. ' + row['opb'] + '\n3. ' + row['opc'] + '\n4. ' + row['opd'] + '\nRespond only with the number of the chosen option.'
+    
+df = df.sample(n=2000, random_state=42) # sample only 500 questions for testing
 
 df_dict = df.to_dict(orient='records')
 
-dataset = Dataset.from_dict({'instruction': [item['prompt'] for item in df_dict], 'output': [item['completion'] for item in df_dict]})
+dataset = Dataset.from_dict({'instruction': [item['prompt'] for item in df_dict], 'output': [str(item['cop'])+"." for item in df_dict]})
 dataset = dataset.train_test_split(0.3)
 
 
-model_id = "meta-llama/Meta-Llama-3-8B-Instruct"
+model_id = "mistralai/Mistral-7B-Instruct-v0.2"
 
-tokenizer = AutoTokenizer.from_pretrained(model_id, token=access_token)
+tokenizer = AutoTokenizer.from_pretrained(model_id)
 
 # set pad_token_id equal to the eos_token_id if not set
 if tokenizer.pad_token_id is None:
@@ -82,7 +91,6 @@ device_map = {"": torch.cuda.current_device()} if torch.cuda.is_available() else
 
 model_kwargs = dict(
     attn_implementation="flash_attention_2", # set this to True if your GPU supports it (Flash Attention drastically speeds up model computations)
-    token=access_token,
     torch_dtype="auto",
     use_cache=False, # set to False as we're going to use gradient checkpointing
     device_map="auto",
@@ -90,7 +98,7 @@ model_kwargs = dict(
 )
 
 # path where the Trainer will save its checkpoints and logs
-output_dir = 'data/llama3_trained_NONquant_hyperpar'
+output_dir = 'data/mistral_trained'
 
 # based on config
 training_args = TrainingArguments(
