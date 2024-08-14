@@ -24,7 +24,7 @@ df['prompt'] = None
 for index, row in df.iterrows():
     df.at[index, 'prompt'] = row['question'] + '\nchoose only one of the following options: \n1. ' + row['opa'] + '\n2. ' + row['opb'] + '\n3. ' + row['opc'] + '\n4. ' + row['opd'] + '\nRespond only with the number of the chosen option.'
     
-df = df.sample(n=20000, random_state=42) 
+df = df.sample(n=20000, random_state=42) # sample only 500 questions for testing
 
 df_dict = df.to_dict(orient='records')
 
@@ -151,6 +151,7 @@ trainer = SFTTrainer(
         tokenizer=tokenizer,
         packing=True,
         peft_config=peft_config,
+        max_seq_length=tokenizer.model_max_length,
     )
 
 train_result = trainer.train()
