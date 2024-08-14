@@ -103,7 +103,7 @@ output_dir = 'data/mistral_trained'
 training_args = TrainingArguments(
     bf16=True, # specify bf16=True instead when training on GPUs that support bf16 else fp16
     do_eval=True,
-    evaluation_strategy="epoch",
+    eval_strategy="epoch",
     gradient_accumulation_steps=16,#128
     gradient_checkpointing=True,
     gradient_checkpointing_kwargs={"use_reentrant": False},
@@ -111,7 +111,7 @@ training_args = TrainingArguments(
     learning_rate=2.0e-04,
     log_level="info",
     logging_steps=5,
-    logging_strategy="steps",
+    logging_strategy="epoch",
     lr_scheduler_type="cosine",
     max_steps=-1,
     num_train_epochs=3,
@@ -151,7 +151,6 @@ trainer = SFTTrainer(
         tokenizer=tokenizer,
         packing=True,
         peft_config=peft_config,
-        max_seq_length=tokenizer.model_max_length,
     )
 
 train_result = trainer.train()
