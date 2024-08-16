@@ -5,7 +5,7 @@ Our goal is to help researchers and practitioners efficiently leverage HPC infra
 ## Contents
 - **Embedding Indices**: This repository provides scripts for building information retrieval tool using BGE embeddings - BGE-M3 model, to retrieve similar documents from the 20 Newsgroups dataset using an Annoy index.
 - **NER**: This repository contains scripts and utilities for training DistilBERT model for Named Entity Recognition (NER). The model is fine-tuned on the CoNLL-2003 dataset, which includes named entities such as persons (PER), organizations (ORG), locations (LOC), and miscellaneous entities (MISC).
-![Highlighted Sentence](NER_image.png)
+![NER image](NER_image.png)
 - **Sentiment Analysis**: This repository provides scripts to train a BERT model for sentiment analysis using the Twitter dataset. It includes data preprocessing, model training, evaluation, and inference.
 
 **Note:** Customize paths and file names as necessary based on your project structure and requirements.
