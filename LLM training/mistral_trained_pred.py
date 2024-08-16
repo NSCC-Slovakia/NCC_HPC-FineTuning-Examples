@@ -31,7 +31,7 @@ df = df[df['choice_type'] != 'multi'] # only single choice questions, multi choi
 df['prompt'] = None
 df['answer'] = None
 for index, row in df.iterrows():
-    df.at[index, 'prompt'] = row['question'] + '\nchoose only one of the following options: \n1. ' + row['opa'] + '\n2. ' + row['opb'] + '\n3. ' + row['opc'] + '\n4. ' + row['opd'] + '\nRespond only with the number of the chosen option.'
+    df.at[index, 'prompt'] = row['question'] + '\nchoose only one of the following options: \n0. ' + row['opa'] + '\n1. ' + row['opb'] + '\n2. ' + row['opc'] + '\n3. ' + row['opd'] + '\nRespond only with the number of the chosen option.'
     
 df = df.sample(n=500, random_state=seed) # sample only 500 questions for testing
 
@@ -70,13 +70,13 @@ df['prediction'] = None
 
 for index, row in df.iterrows():
     pom = row["answer"]
-    if row["opa"] in pom or "1." in pom or "1" in pom:
+    if "0" in pom:
         df.at[index, "prediction"] = 0
-    elif row["opb"] in pom or "2." in pom or "2" in pom:  
+    elif "1" in pom:  
         df.at[index, "prediction"] = 1
-    elif row["opc"] in pom or "3." in pom or "3" in pom:
+    elif "2" in pom:
         df.at[index, "prediction"] = 2
-    elif row["opd"] in pom or "4." in pom or "4" in pom:  
+    elif "3" in pom:  
         df.at[index, "prediction"] = 3
     else:
         df.at[index, "prediction"] = "invalid"

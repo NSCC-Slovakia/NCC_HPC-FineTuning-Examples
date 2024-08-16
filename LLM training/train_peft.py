@@ -22,7 +22,7 @@ df = df[df['choice_type'] != 'multi'] # only single choice questions, multi choi
 # create prompts for the model
 df['prompt'] = None
 for index, row in df.iterrows():
-    df.at[index, 'prompt'] = row['question'] + '\nchoose only one of the following options: \n1. ' + row['opa'] + '\n2. ' + row['opb'] + '\n3. ' + row['opc'] + '\n4. ' + row['opd'] + '\nRespond only with the number of the chosen option.'
+    df.at[index, 'prompt'] = row['question'] + '\nchoose only one of the following options: \n0. ' + row['opa'] + '\n1. ' + row['opb'] + '\n2. ' + row['opc'] + '\n3. ' + row['opd'] + '\nRespond only with the number of the chosen option.'
     
 df = df.sample(n=20000, random_state=42) # sample only 500 questions for testing
 
