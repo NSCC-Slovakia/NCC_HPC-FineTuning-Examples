@@ -31,7 +31,7 @@ df['answer'] = None
 for index, row in df.iterrows():
     df.at[index, 'prompt'] = row['question'] + '\nchoose only one of the following options: \n0. ' + row['opa'] + '\n1. ' + row['opb'] + '\n2. ' + row['opc'] + '\n3. ' + row['opd'] + '\nRespond only with the number of the chosen option.'
     
-df = df.sample(n=500, random_state=seed) # sample only 500 questions for testing
+df = df.sample(n=500, random_state=seed) # sample only 500 questions for testing, just for the example purposes
 
 terminators = [
     tokenizer.eos_token_id,
@@ -58,12 +58,11 @@ for index, row in df.iterrows():
         )
     response = prompt_outputs[0][prompt_inputs.shape[-1]:]
     df.loc[index, 'answer'] = tokenizer.decode(response, skip_special_tokens=True)
-    print(tokenizer.decode(response, skip_special_tokens=True))
-    print(b)
+    print("Response of the LLM: {}".format(tokenizer.decode(response, skip_special_tokens=True)))
+    print("{}. sample".format(b))
     b = b + 1
 
-print(df.head())
-
+# change the responses to the predictions of correct answer (0, 1, 2, 3)
 df['prediction'] = None
 
 for index, row in df.iterrows():
@@ -78,7 +77,8 @@ for index, row in df.iterrows():
         df.at[index, "prediction"] = 3
     else:
         df.at[index, "prediction"] = "invalid"
-        
+
+# calculate accuracy, false positive and invalid predictions        
 accuracy = sum(df["cop"] == df["prediction"])/df.shape[0]
 false_positive = sum(df["cop"] != df["prediction"])/df.shape[0]
 no_invalid = sum(df["prediction"] == "invalid")/df.shape[0]
@@ -87,5 +87,6 @@ print("Accuracy: ", accuracy)
 print("False positive: ", false_positive)
 print("Invalid: ", no_invalid)
 
+# save the results
 filename = "data/test_mistral"
 df.to_csv(filename+".csv", index=False)

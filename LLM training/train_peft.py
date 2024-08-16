@@ -24,8 +24,9 @@ df['prompt'] = None
 for index, row in df.iterrows():
     df.at[index, 'prompt'] = row['question'] + '\nchoose only one of the following options: \n0. ' + row['opa'] + '\n1. ' + row['opb'] + '\n2. ' + row['opc'] + '\n3. ' + row['opd'] + '\nRespond only with the number of the chosen option.'
     
-df = df.sample(n=20000, random_state=42) # sample only 500 questions for testing
+df = df.sample(n=20000, random_state=42) # sample only 20000 questions for training, just for the example purposes
 
+# create training dataset
 df_dict = df.to_dict(orient='records')
 
 dataset = Dataset.from_dict({'instruction': [item['prompt'] for item in df_dict], 'output': [str(item['cop'])+"." for item in df_dict]})
@@ -33,7 +34,6 @@ dataset = dataset.train_test_split(0.3)
 
 
 model_id = "mistralai/Mistral-7B-Instruct-v0.2"
-
 tokenizer = AutoTokenizer.from_pretrained(model_id)
 
 # set pad_token_id equal to the eos_token_id if not set
@@ -47,40 +47,31 @@ if tokenizer.model_max_length > 100_000:
 # Set padding strategy because of warning  
 tokenizer.padding_side = 'right'
 
-# Set chat template
-# DEFAULT_CHAT_TEMPLATE = "{% for message in messages %}\n{% if message['role'] == 'user' %}\n{{ '<|user|>\n' + message['content'] + eos_token }}\n{% elif message['role'] == 'system' %}\n{{ '<|system|>\n' + message['content'] + eos_token }}\n{% elif message['role'] == 'assistant' %}\n{{ '<|assistant|>\n'  + message['content'] + eos_token }}\n{% endif %}\n{% if loop.last and add_generation_prompt %}\n{{ '<|assistant|>' }}\n{% endif %}\n{% endfor %}"
-# tokenizer.chat_template = DEFAULT_CHAT_TEMPLATE
-print(dataset["train"])
-
+# define chat template, must be same in the prediction as in the training!
 def apply_chat_template(example, tokenizer):
     chat = [
-        {"role": "user", "content": example['instruction']}, #novy system content + MS prompt
+        {"role": "user", "content": example['instruction']},
         { "role": "assistant", "content": example['output'] },
     ]
     example["text"] = tokenizer.apply_chat_template(chat, tokenize=False)
     return example
 
 column_names = list(dataset["train"].features)
-print(dataset["train"])
+
 raw_datasets = dataset.map(apply_chat_template,
-                                #num_proc=cpu_count(),
                                 fn_kwargs={"tokenizer": tokenizer},
                                 remove_columns=column_names,
                                 desc="Applying chat template",)
 
-print(raw_datasets)
-print(raw_datasets["train"])
-print(raw_datasets["train"][0])
-# create the splits
+# create the train test splits for the training
 train_dataset = raw_datasets["train"]
 eval_dataset = raw_datasets["test"]
 
 for index in random.sample(range(len(raw_datasets["train"])), 3):
   print(f"Sample {index} of the processed training set:\n\n{raw_datasets['train'][index]['text']}")
   
-
-
-# specify how to quantize the model
+# specify how to quantize the model, this save a lot of memory and speed up the training
+# if you want to quantize it uncomment the line in the model_kwargs
 quantization_config = BitsAndBytesConfig(
             load_in_4bit=True,
             bnb_4bit_quant_type="nf4",
@@ -93,21 +84,20 @@ model_kwargs = dict(
     torch_dtype="auto",
     use_cache=False, # set to False as we're going to use gradient checkpointing
     device_map="auto",
-    # quantization_config=quantization_config,
+    # quantization_config=quantization_config, # uncomment this line to enable quantization
 )
 
 # path where the Trainer will save its checkpoints and logs
 output_dir = 'data/mistral_trained'
 
-# based on config
+# hyperparameters for the training
 training_args = TrainingArguments(
-    bf16=True, # specify bf16=True instead when training on GPUs that support bf16 else fp16
+    bf16=True, 
     do_eval=True,
     eval_strategy="epoch",
-    gradient_accumulation_steps=16,#128
+    gradient_accumulation_steps=16,
     gradient_checkpointing=True,
     gradient_checkpointing_kwargs={"use_reentrant": False},
-    #warmup_steps=200,
     learning_rate=2.0e-04,
     log_level="info",
     logging_steps=5,
@@ -117,8 +107,8 @@ training_args = TrainingArguments(
     num_train_epochs=3,
     output_dir=output_dir,
     overwrite_output_dir=True,
-    per_device_eval_batch_size=1, # originally set to 8
-    per_device_train_batch_size=1, # originally set to 8
+    per_device_eval_batch_size=1, 
+    per_device_train_batch_size=1,
     # push_to_hub=True,
     # hub_model_id="zephyr-7b-sft-lora",
     # hub_strategy="every_save",
@@ -127,10 +117,9 @@ training_args = TrainingArguments(
     save_strategy="epoch",
     save_total_limit=None,
     seed=42,
-    #optim='paged_adamw_32bit',
 )
 
-# based on config
+# Peft configuration, enables to train only the adapters to the model, not whole model
 peft_config = LoraConfig(
         r=64,
         lora_alpha=128,
@@ -141,6 +130,7 @@ peft_config = LoraConfig(
 )
 print(train_dataset)
 
+# create the trainer
 trainer = SFTTrainer(
         model=model_id,
         model_init_kwargs=model_kwargs,
@@ -154,13 +144,16 @@ trainer = SFTTrainer(
         max_seq_length=tokenizer.model_max_length,
     )
 
+# train the model
 train_result = trainer.train()
 
+# save the results
 metrics = train_result.metrics
-max_train_samples = len(train_dataset) #training_args.max_train_samples if training_args.max_train_samples is not None else len(train_dataset)
+max_train_samples = len(train_dataset)
 metrics["train_samples"] = min(max_train_samples, len(train_dataset))
 trainer.log_metrics("train", metrics)
 trainer.save_metrics("train", metrics)
 trainer.save_state()
 
+# Make the predictions with trained model and save the results
 
