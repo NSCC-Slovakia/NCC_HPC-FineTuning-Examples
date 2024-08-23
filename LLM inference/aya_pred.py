@@ -60,8 +60,8 @@ for index, row in df.iterrows():
         df.at[index, "prediction"] = -1
 
 # calculate accuracy, false positive and invalid predictions
-accuracy = sum(int(df["cop"]) == int(df["prediction"]))/df.shape[0]
-false_positive = sum(int(df["cop"])) != int(df["prediction"])/df.shape[0]
+accuracy = sum(df["cop"] == df["prediction"])/df.shape[0]
+false_positive = sum(df["cop"]) != df["prediction"]/df.shape[0]
 no_invalid = sum(df["prediction"] == -1)/df.shape[0]
 
 print("Accuracy: ", accuracy)
