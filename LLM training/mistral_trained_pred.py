@@ -81,12 +81,12 @@ for index, row in df.iterrows():
     elif "3" in pom:  
         df.at[index, "prediction"] = 3
     else:
-        df.at[index, "prediction"] = "invalid"
+        df.at[index, "prediction"] = -1
         
 # calculate accuracy, false positive and invalid predictions
 accuracy = sum(df["cop"] == df["prediction"])/df.shape[0]
 false_positive = sum(df["cop"] != df["prediction"])/df.shape[0]
-no_invalid = sum(df["prediction"] == "invalid")/df.shape[0]
+no_invalid = sum(df["prediction"] == -1)/df.shape[0]
 
 print("Accuracy: ", accuracy)
 print("False positive: ", false_positive)
