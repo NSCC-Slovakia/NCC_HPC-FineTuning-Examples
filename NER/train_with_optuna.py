@@ -96,5 +96,5 @@ best_trial = trainer.hyperparameter_search(
 best_trial
 
 # Save the final model
-#trainer.save_model("models/res1/final_model")
+#trainer.save_model("models/final_model")
 

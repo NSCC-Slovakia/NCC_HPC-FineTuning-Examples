@@ -82,7 +82,7 @@ trainer = Trainer(
 trainer.train()
 
 # Save the final model
-trainer.save_model("models/res1/final_model")
+trainer.save_model("models/final_model")
 
 # check the results on the test dataset
 test_metrics = trainer.predict(tokenized_dataset['test'].remove_columns(["id", "tokens", "ner_tags"])).metrics
