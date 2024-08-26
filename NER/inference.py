@@ -8,7 +8,7 @@ def main(args):
     model = AutoModelForTokenClassification.from_pretrained(args.model_path)
 
     # Create NER pipeline
-    ner = pipeline("ner", model=model, tokenizer=tokenizer)
+    ner = pipeline("ner", model=model, tokenizer=tokenizer, device=0)
 
     # Example usage
     text = "Apple is expected to launch new products next week in California."

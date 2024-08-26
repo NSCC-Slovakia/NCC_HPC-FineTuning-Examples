@@ -8,7 +8,7 @@
 
 module load singularity
 
-singularity exec --nv /storage-data/singularity_containers/pt-2.3_llm.sif python3 inference.py --model_path $MODEL_DIR
+singularity exec --nv /storage-data/singularity_containers/pt-2.3_llm.sif python3 inference.py --model_path models/final_model
 
 
 
