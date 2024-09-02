@@ -30,4 +30,25 @@ To use the examples provided in this repository, you have two options:
   sudo singularity build test.sif pt_devel_llm.recipe
 
 ## Hugging Face Token Setup
-Also some of the scripts require that you have account and the [access token](https://huggingface.co/docs/hub/en/security-tokens) generated at the [Hugging Face](https://huggingface.co/) website. The token is used to access some models. The token should be added to the code as a string as shown at the [access token](https://huggingface.co/docs/hub/en/security-tokens).
+Some of the scripts require that you have account and the [access token](https://huggingface.co/docs/hub/en/security-tokens) generated at the [Hugging Face](https://huggingface.co/) website. The token is used to access some models. The token should be added to the code as a string as shown at the [access token](https://huggingface.co/docs/hub/en/security-tokens).
+
+### Example: Loading a Model with an Access Token
+
+To load a model using an access token, you can use the following code snippet:
+
+```python
+from transformers import AutoModelForCausalLM, AutoTokenizer
+
+model_id = "your-model-id"
+access_token = "your-access-token"
+
+model = AutoModelForCausalLM.from_pretrained(
+    model_id,
+    token=access_token,  # Add the access token here
+    device_map='cuda'
+)
+
+tokenizer = AutoTokenizer.from_pretrained(
+    model_id,
+    token=access_token  # Add the access token here
+)
