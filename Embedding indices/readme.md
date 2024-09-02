@@ -10,7 +10,7 @@ This repository provides scripts to build BGE embeddings using the BGE-M3 model 
 ---
 
 **Note:** Customize paths and file names as necessary based on your project structure and requirements.
-The `bge_embeddings.py` script downloads data and models from the internet. Therefore, it is necessary to use a node with access to the internet (login node) to run this script for the first time.
+The `bge_embeddings.py` script downloads data and models from the internet. Therefore, it is necessary to use a node with access to the internet to run this script for the first time.
 
 
 

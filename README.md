@@ -11,7 +11,7 @@ Our goal is to help researchers and practitioners efficiently leverage HPC infra
 - **LLM Training**: This repository provides scripts for fine-tuning a pre-trained language model (LLM) using the Hugging Face Transformers library. The scripts demonstrate how to load a pre-trained model, tokenize input text, and train the model on a custom dataset.
 
 **Note:** Customize paths and file names as necessary based on your project structure and requirements.
-The tutorial scripts download data and models from the internet, so it's necessary to use a node with internet access (login node) to run these scripts for the first time. The downloaded files will then be saved in cache for subsequent runs.
+The tutorial scripts download data and models from the internet, so it's necessary to use a node with internet access to run these scripts for the first time. The downloaded files will then be saved in cache for subsequent runs.
 
 ## Requirements
 

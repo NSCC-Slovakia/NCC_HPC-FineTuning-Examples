@@ -22,4 +22,4 @@ This repository contains scripts and utilities for training DistilBERT model for
 
 ---
 
-**Note:** Customize paths and file names as necessary based on your project structure and requirements. The tutorial scripts download data and models from the internet, so it's necessary to use a node with internet access (login node) to run these scripts for the first time. The downloaded files will then be saved in cache for subsequent runs.
+**Note:** Customize paths and file names as necessary based on your project structure and requirements. The tutorial scripts download data and models from the internet, so it's necessary to use a node with internet access to run these scripts for the first time. The downloaded files will then be saved in cache for subsequent runs.
