@@ -52,7 +52,7 @@ tokenizer = AutoTokenizer.from_pretrained(
     model_id,
     token=access_token  # Add the access token here
 )
-\
+```
 
 Before accessing certain models, you may need to agree to the conditions on the model card on the Hugging Face website, including sharing your contact information (email and username) with the repository authors.
 
