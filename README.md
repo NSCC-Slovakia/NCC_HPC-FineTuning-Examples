@@ -20,8 +20,6 @@ To use the examples provided in this repository, you have two options:
 1. **Use an Existing Singularity Image**: Utilize the existing Singularity image named `pt-2.3_llm.sif`, which contains all the necessary libraries.
 2. **Create a New Singularity Image**: Follow the instructions below to create a new Singularity image.
 
-Also some of the scripts require that you have account and the [access token](https://huggingface.co/docs/hub/en/security-tokens) generated at the [Hugging Face](https://huggingface.co/) website. The token is used to access some models. The token should be added to the code as a string as shown at the [access token](https://huggingface.co/docs/hub/en/security-tokens).
-
 ### Instructions for Creating a New Singularity Image:
 
 - **Singularity**: Ensure you have Singularity-CE version 3.10 or higher installed.
@@ -30,3 +28,5 @@ Also some of the scripts require that you have account and the [access token](ht
 
   ```sh
   sudo singularity build test.sif pt_devel_llm.recipe
+
+Also some of the scripts require that you have account and the [access token](https://huggingface.co/docs/hub/en/security-tokens) generated at the [Hugging Face](https://huggingface.co/) website. The token is used to access some models. The token should be added to the code as a string as shown at the [access token](https://huggingface.co/docs/hub/en/security-tokens).
