@@ -5,8 +5,19 @@ import pandas as pd
 from trl import SFTTrainer
 from peft import LoraConfig
 from datasets import Dataset
-from transformers import AutoTokenizer, BitsAndBytesConfig, TrainingArguments
+from transformers import AutoTokenizer, BitsAndBytesConfig, TrainingArguments, AutoModelForCausalLM
+from accelerate import PartialState
 
+
+def print_gpu_utilization():
+    pynvml.nvmlInit()
+    device_count = pynvml.nvmlDeviceGetCount()
+    memory_used = []
+    for device_index in range(device_count):
+        device_handle = pynvml.nvmlDeviceGetHandleByIndex(device_index)
+        device_info = pynvml.nvmlDeviceGetMemoryInfo(device_handle)
+        memory_used.append(device_info.used/1024**3)
+    print('Memory occupied on GPUs: ' + ' + '.join([f'{mem:.1f}' for mem in memory_used]) + ' GB.')
 
 splits = {'train': 'data/train-00000-of-00001.parquet', 'test': 'data/test-00000-of-00001.parquet', 'validation': 'data/validation-00000-of-00001.parquet'}
 df = pd.read_parquet("hf://datasets/openlifescienceai/medmcqa/" + splits["train"])
@@ -63,20 +74,28 @@ eval_dataset = raw_datasets["test"]
 for index in random.sample(range(len(raw_datasets["train"])), 3):
   print(f"Sample {index} of the processed training set:\n\n{raw_datasets['train'][index]['text']}")
   
+# initialize the PartialState (for the accekerate)
+ps = PartialState()
+num_processes = ps.num_processes
+process_index = ps.process_index
+local_process_index = ps.local_process_index
+
 # specify how to quantize the model, this save a lot of memory and speed up the training
 # if you want to quantize it uncomment the line in the model_kwargs
 quantization_config = BitsAndBytesConfig(
             load_in_4bit=True,
+            bnb_4bit_use_double_quant=True,
             bnb_4bit_quant_type="nf4",
             bnb_4bit_compute_dtype=torch.float16,
 )
 device_map = {"": torch.cuda.current_device()} if torch.cuda.is_available() else None
 
-model_kwargs = dict(
+model = AutoModelForCausalLM.from_pretrained(
+  model_id,
     attn_implementation="flash_attention_2", # set this to True if your GPU supports it (Flash Attention drastically speeds up model computations)
     torch_dtype="auto",
     use_cache=False, # set to False as we're going to use gradient checkpointing
-    device_map="auto",
+    device_map={'':local_process_index},
     # quantization_config=quantization_config, # uncomment this line to enable quantization
 )
 
@@ -88,6 +107,8 @@ training_args = TrainingArguments(
     bf16=True, 
     do_eval=True,
     eval_strategy="epoch",
+    per_device_eval_batch_size=1, 
+    per_device_train_batch_size=8,
     gradient_accumulation_steps=16,
     gradient_checkpointing=True,
     gradient_checkpointing_kwargs={"use_reentrant": False},
@@ -100,8 +121,6 @@ training_args = TrainingArguments(
     num_train_epochs=3,
     output_dir=output_dir,
     overwrite_output_dir=True,
-    per_device_eval_batch_size=1, 
-    per_device_train_batch_size=1,
     # push_to_hub=True,
     # hub_model_id="zephyr-7b-sft-lora",
     # hub_strategy="every_save",
@@ -125,8 +144,7 @@ print(train_dataset)
 
 # create the trainer
 trainer = SFTTrainer(
-        model=model_id,
-        model_init_kwargs=model_kwargs,
+        model=model,
         args=training_args,
         train_dataset=train_dataset,
         eval_dataset=eval_dataset,
@@ -137,9 +155,23 @@ trainer = SFTTrainer(
         max_seq_length=tokenizer.model_max_length,
     )
 
+if process_index == 0:  # Only print in first process.
+    if hasattr(trainer.model, "print_trainable_parameters"):
+        trainer.model.print_trainable_parameters()
+        
 # train the model
 train_result = trainer.train()
 
+# Print statistics in first process only:
+if process_index == 0:
+    print(f"Run time: {train_result.metrics['train_runtime']:.2f} seconds")
+    print(f"{num_processes} GPUs used.")
+    print(f"Training speed: {train_result.metrics['train_samples_per_second']:.1f} samples/s (={train_result.metrics['train_samples_per_second'] / num_processes:.1f} samples/s/GPU)")
+
+# Print memory usage once per node:
+if local_process_index == 0:
+    print_gpu_utilization()
+    
 # save the results
 metrics = train_result.metrics
 max_train_samples = len(train_dataset)
@@ -148,5 +180,6 @@ trainer.log_metrics("train", metrics)
 trainer.save_metrics("train", metrics)
 trainer.save_state()
 
-# Make the predictions with trained model and save the results
+if process_index == 0:
+    trainer.save_model()
 
