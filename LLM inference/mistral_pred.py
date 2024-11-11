@@ -3,12 +3,25 @@ import pandas as pd
 import torch
 import numpy as np
 import random
+import pynvml
+import time
 
 seed = 42
 random.seed(seed)
 np.random.seed(seed)
 torch.manual_seed(seed)
 torch.cuda.manual_seed_all(seed)
+
+def print_gpu_utilization():
+    pynvml.nvmlInit()
+    device_count = pynvml.nvmlDeviceGetCount()
+    memory_used = []
+    for device_index in range(device_count):
+        device_handle = pynvml.nvmlDeviceGetHandleByIndex(device_index)
+        device_info = pynvml.nvmlDeviceGetMemoryInfo(device_handle)
+        memory_used.append(device_info.used/1024**3)
+    print('Memory occupied on GPUs: ' + ' + '.join([f'{mem:.1f}' for mem in memory_used]) + ' GB.')
+
 
 model_id = "mistralai/Mistral-7B-Instruct-v0.2"
 
@@ -38,6 +51,8 @@ terminators = [
     tokenizer.convert_tokens_to_ids("<|eot_id|>")
 ]
 
+start_time = time.time()
+
 b = 0
 for index, row in df.iterrows():
     chat = [
@@ -61,6 +76,7 @@ for index, row in df.iterrows():
     print("Response of the LLM: {}".format(tokenizer.decode(response, skip_special_tokens=True)))
     print("{}. sample".format(b))
     b = b + 1
+end_time = time.time()
 
 # change the responses to the predictions of correct answer (0, 1, 2, 3)
 df['prediction'] = None
@@ -86,6 +102,11 @@ no_invalid = sum(df["prediction"] == -1)/df.shape[0]
 print("Accuracy: ", accuracy)
 print("False positive: ", false_positive)
 print("Invalid: ", no_invalid)
+
+# print the GPU utilization and benchmarks
+print(f"Run time: {end_time - start_time:.2f} seconds")
+print(f"Samples/second: {len(df) / (end_time - start_time):.1f}")
+print_gpu_utilization()
 
 # save the results
 filename = "data/test_mistral"
