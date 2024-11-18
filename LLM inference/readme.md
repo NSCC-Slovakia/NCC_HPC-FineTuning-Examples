@@ -39,5 +39,14 @@ tokenizer = AutoTokenizer.from_pretrained(
 
 Before accessing certain models, you may need to agree to the conditions on the model card on the Hugging Face website, including sharing your contact information (email and username) with the repository authors.
 
+## LLM Prediction Benchmark
 
+### [Mistral-7B-Instruct-v0.2](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2) single GPU inference on [Devana HPC](https://userdocs.nscc.sk/devana/system_overview/introduction/) 
 
+Evaluate [Mistral-7B-Instruct-v0.2](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2) without, with 8-bit and with 4-bit [bitsandbytes quantisation](https://huggingface.co/docs/bitsandbytes/index) on the [MedMCQA](https://medmcqa.github.io) dataset. 
+
+| Setup | Inference speed | Inference GPU memory |
+| - | - | - |
+| w/o bnb | 1.8 samples/s | 16.6 GB |
+| w/ bnb (8bit)| 7.9 samples/s | 19.8 samples/s |
+| w/ bnb (4bit) | 8.7 samples/s | 22.7 samples/s |

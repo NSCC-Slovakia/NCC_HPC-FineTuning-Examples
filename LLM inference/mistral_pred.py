@@ -1,4 +1,4 @@
-from transformers import AutoTokenizer, AutoModelForCausalLM
+from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
 import pandas as pd
 import torch
 import numpy as np
@@ -26,11 +26,19 @@ def print_gpu_utilization():
 model_id = "mistralai/Mistral-7B-Instruct-v0.2"
 
 tokenizer = AutoTokenizer.from_pretrained(model_id)
+
+quantization_config = BitsAndBytesConfig(
+            load_in_8bit=True,
+            bnb_8bit_quant_type="nf4",
+            bnb_8bit_compute_dtype=torch.float16,
+)
+
 model = AutoModelForCausalLM.from_pretrained(
     model_id,
     low_cpu_mem_usage=True,
     torch_dtype=torch.bfloat16,
-    device_map='cuda'
+    device_map='cuda',
+    quantization_config=quantization_config, # uncomment this line to enable quantization
 )
 
 # load only the test data
