@@ -16,5 +16,5 @@ module load singularity
 export PYTHONNOUSERSITE=1
 
 # Execute train_mistral_peft.py
-singularity exec --nv /storage-data/singularity_containers/pt-2.3_llm.sif python3 train_mistral_peft.py 
+singularity exec --nv /storage-data/singularity_containers/pt_llm_sk.sif python3 train_mistral_peft.py 
 

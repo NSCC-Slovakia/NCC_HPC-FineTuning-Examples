@@ -6,6 +6,19 @@ from trl import SFTTrainer
 from peft import LoraConfig
 from datasets import Dataset
 from transformers import AutoTokenizer, BitsAndBytesConfig, TrainingArguments
+import pynvml
+import time
+
+
+def print_gpu_utilization():
+    pynvml.nvmlInit()
+    device_count = pynvml.nvmlDeviceGetCount()
+    memory_used = []
+    for device_index in range(device_count):
+        device_handle = pynvml.nvmlDeviceGetHandleByIndex(device_index)
+        device_info = pynvml.nvmlDeviceGetMemoryInfo(device_handle)
+        memory_used.append(device_info.used/1024**3)
+    print('Memory occupied on GPUs: ' + ' + '.join([f'{mem:.1f}' for mem in memory_used]) + ' GB.')
 
 
 splits = {'train': 'data/train-00000-of-00001.parquet', 'test': 'data/test-00000-of-00001.parquet', 'validation': 'data/validation-00000-of-00001.parquet'}
@@ -77,7 +90,7 @@ model_kwargs = dict(
     torch_dtype="auto",
     use_cache=False, # set to False as we're going to use gradient checkpointing
     device_map="auto",
-    # quantization_config=quantization_config, # uncomment this line to enable quantization
+    quantization_config=quantization_config, # uncomment this line to enable quantization
 )
 
 # path where the Trainer will save its checkpoints and logs
@@ -136,9 +149,11 @@ trainer = SFTTrainer(
         peft_config=peft_config,
         max_seq_length=tokenizer.model_max_length,
     )
-
+start_time = time.time()
 # train the model
 train_result = trainer.train()
+
+end_time = time.time()
 
 # save the results
 metrics = train_result.metrics
@@ -147,6 +162,11 @@ metrics["train_samples"] = min(max_train_samples, len(train_dataset))
 trainer.log_metrics("train", metrics)
 trainer.save_metrics("train", metrics)
 trainer.save_state()
+
+# print the GPU utilization and benchmarks
+print(f"Run time: {end_time - start_time:.2f} seconds")
+print(f"Samples/second: {len(df) / (end_time - start_time):.1f}")
+print_gpu_utilization()
 
 # Make the predictions with trained model and save the results
 

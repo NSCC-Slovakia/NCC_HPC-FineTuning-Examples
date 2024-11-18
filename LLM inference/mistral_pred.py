@@ -27,24 +27,18 @@ model_id = "mistralai/Mistral-7B-Instruct-v0.2"
 
 tokenizer = AutoTokenizer.from_pretrained(model_id)
 
-quantization_config_4bit = BitsAndBytesConfig(
+quantization_config = BitsAndBytesConfig(
             load_in_4bit=True,
             bnb_4bit_quant_type="nf4",
             bnb_4bit_compute_dtype=torch.float16,
 )
 
-quantization_config_8bit = BitsAndBytesConfig(
-    load_in_8bit=True,  
-    llm_int8_threshold=6.0,  
-    llm_int8_has_fp16_weight=True  
-)
-
 model = AutoModelForCausalLM.from_pretrained(
     model_id,
     low_cpu_mem_usage=True,
-    # torch_dtype=torch.bfloat16, # comment this line when using quantization
+    torch_dtype='auto', # comment this line when using quantization
     device_map='auto',
-    quantization_config=quantization_config_8bit, # uncomment this line to enable quantization
+    quantization_config=quantization_config, # uncomment this line to enable quantization
 )
 
 # load only the test data
