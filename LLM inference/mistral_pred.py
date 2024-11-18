@@ -72,7 +72,8 @@ for batch_start in range(0, len(df), batch_size):
 
     # Prepare batch prompts
     chat_list = [
-        [{"role": "user", "content": row['prompt']}] for _, row in batch.iterrows()
+        {"role": "user", "content": row['prompt']},
+        {"role": "assistant", "content": ""},  # Placeholder for the assistant
     ]
 
     # Tokenize the batch
