@@ -47,6 +47,7 @@ Evaluate [Mistral-7B-Instruct-v0.2](https://huggingface.co/mistralai/Mistral-7B-
 
 | Setup | Inference speed | Inference GPU memory |
 | - | - | - |
-| w/o bnb | 1.8 samples/s | 16.6 GB |
+| w/o bnb (login node) | 1.8 samples/s | 16.6 GB |
+| w/o bnb | 2.3 samples/s | 16.6 GB |
 | w/ bnb (8bit)| 7.9 samples/s | 19.8 samples/s |
 | w/ bnb (4bit) | 8.7 samples/s | 22.7 samples/s |

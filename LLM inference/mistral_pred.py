@@ -36,7 +36,7 @@ quantization_config = BitsAndBytesConfig(
 model = AutoModelForCausalLM.from_pretrained(
     model_id,
     low_cpu_mem_usage=True,
-    torch_dtype=torch.bfloat16,
+    # torch_dtype=torch.bfloat16, # comment this line when using quantization
     device_map='cuda',
     quantization_config=quantization_config, # uncomment this line to enable quantization
 )
