@@ -50,5 +50,4 @@ Evaluate [Mistral-7B-Instruct-v0.2](https://huggingface.co/mistralai/Mistral-7B-
 | w/o bnb (login node) | 1 | 1.8 samples/s | 16.6 GB |
 | w/o bnb | 1 | 2.3 samples/s | 16.6 GB |
 | w/o bnb | 2 | 2.4 samples/s | 16.6 + 0.6 GB |
-| w/ bnb (8bit) | 1 | 7.9 samples/s | 19.8 samples/s |
 | w/ bnb (4bit) | 1 | 1.3 samples/s | 7.3 GB |

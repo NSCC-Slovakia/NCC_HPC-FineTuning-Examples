@@ -38,7 +38,7 @@ model = AutoModelForCausalLM.from_pretrained(
     low_cpu_mem_usage=True,
     torch_dtype='auto', # comment this line when using quantization
     device_map='auto',
-    quantization_config=quantization_config, # uncomment this line to enable quantization
+    #quantization_config=quantization_config, # uncomment this line to enable quantization
 )
 
 # load only the test data
@@ -59,31 +59,54 @@ terminators = [
     tokenizer.convert_tokens_to_ids("<|eot_id|>")
 ]
 
+batch_size = 8  # Define the batch size
+
 start_time = time.time()
 
+# Initialize a counter
 b = 0
-for index, row in df.iterrows():
-    chat = [
-        {"role": "user", "content": row['prompt'] }, 
+
+# Split the DataFrame into chunks of size `batch_size`
+for batch_start in range(0, len(df), batch_size):
+    batch = df.iloc[batch_start:batch_start + batch_size]
+
+    # Prepare batch prompts
+    chat_list = [
+        [{"role": "user", "content": row['prompt']}] for _, row in batch.iterrows()
     ]
+
+    # Tokenize the batch
     prompt_inputs = tokenizer.apply_chat_template(
-        chat, 
-        add_generation_prompt=True, 
-        return_tensors="pt"
-        ).to(model.device)
-    attention_mask = torch.ones_like(prompt_inputs)  
-    
+        chat_list,
+        add_generation_prompt=True,
+        return_tensors="pt",
+        padding=True,
+    ).to(model.device)
+
+    # Create attention mask (if needed, some tokenizers automatically handle this)
+    attention_mask = torch.ones_like(prompt_inputs)
+
+    # Generate responses for the batch
     prompt_outputs = model.generate(
         prompt_inputs,
         attention_mask=attention_mask,
         max_new_tokens=20,
         eos_token_id=terminators,
-        )
-    response = prompt_outputs[0][prompt_inputs.shape[-1]:]
-    df.loc[index, 'answer'] = tokenizer.decode(response, skip_special_tokens=True)
-    print("Response of the LLM: {}".format(tokenizer.decode(response, skip_special_tokens=True)))
-    print("{}. sample".format(b))
-    b = b + 1
+    )
+
+    # Process each response in the batch
+    for i, response in enumerate(prompt_outputs):
+        # Decode the response
+        generated_text = tokenizer.decode(response[prompt_inputs.shape[-1]:], skip_special_tokens=True)
+        
+        # Update the corresponding row in the DataFrame
+        df.loc[batch.index[i], 'answer'] = generated_text
+
+        # Print the response for debugging
+        print("Response of the LLM: {}".format(generated_text))
+        print("{}. sample".format(b))
+        b += 1
+
 end_time = time.time()
 
 # change the responses to the predictions of correct answer (0, 1, 2, 3)
