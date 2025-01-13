@@ -3,6 +3,7 @@ import re
 import random
 import pandas as pd
 from trl import SFTTrainer
+import pynvml
 from peft import LoraConfig
 from datasets import Dataset
 from transformers import AutoTokenizer, BitsAndBytesConfig, TrainingArguments, AutoModelForCausalLM
@@ -92,7 +93,7 @@ device_map = {"": torch.cuda.current_device()} if torch.cuda.is_available() else
 
 model = AutoModelForCausalLM.from_pretrained(
   model_id,
-    attn_implementation="flash_attention_2", # set this to True if your GPU supports it (Flash Attention drastically speeds up model computations)
+    attn_implementation="sdpa", # set this to True if your GPU supports it (Flash Attention drastically speeds up model computations)
     torch_dtype="auto",
     use_cache=False, # set to False as we're going to use gradient checkpointing
     device_map={'':local_process_index},
